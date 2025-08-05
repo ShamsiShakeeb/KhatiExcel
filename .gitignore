@@ -1,0 +1,45 @@
+﻿## Ignore Visual Studio temporary files, build results, and
+## user-specific files.
+
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Build results
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+*.log
+
+## NuGet packages
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+!**/packages/repositories.config
+
+## Microsoft Azure Web App publish settings
+PublishProfiles/
+
+## Rider
+.idea/
+
+## Resharper
+*.DotSettings.user
+
+## VS Code
+.vscode/
+
+## Others
+*.dbmdl
+*.bak
+*.cache
+*.pdb
+*.pidb
+*.svclog
+*.scc
+
+# Uncomment if using ASP.NET Core
+# wwwroot/

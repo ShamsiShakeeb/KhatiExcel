@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Description>This Nuget Package is can be used for load excel file and store a List into a excel file.</Description>
+    <Copyright>The Package is Created by Shamsi Shakeeb.</Copyright>
+    <PackageIcon>Logo-Microsoft-Excel.jpg</PackageIcon>
+    <Version>1.0.3</Version>
+	<RootNamespace>KhatiExcel</RootNamespace>
+  </PropertyGroup>
+
+  <Target Name="Protect" AfterTargets="Build">
+	<ItemGroup>
+	  <Assemblies Include="$(TargetDir)$(TargetFileName)" />
+	</ItemGroup>
+  </Target>
+
+  <ItemGroup>
+    <None Include="..\..\..\Users\BS01389\Downloads\Logo-Microsoft-Excel.jpg">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.96.0" />
+    <PackageReference Include="ExcelDataReader" Version="3.6.0" />
+    <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.8" />
+  </ItemGroup>
+
+</Project>
