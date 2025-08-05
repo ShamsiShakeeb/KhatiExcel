@@ -5,7 +5,7 @@ namespace KhatiExcel.DependencyResolver
 {
     public static class ExcelFeatureResolver
     {
-        public static IServiceCollection AdoDependency(this IServiceCollection services)
+        public static IServiceCollection ExcelFeature(this IServiceCollection services)
         {
             services.AddSingleton<ILoadExcel,LoadExcel>();
             return services;

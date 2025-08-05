@@ -8,7 +8,7 @@
     <Description>This Nuget Package is can be used for load excel file and store a List into a excel file.</Description>
     <Copyright>The Package is Created by Shamsi Shakeeb.</Copyright>
     <PackageIcon>Logo-Microsoft-Excel.jpg</PackageIcon>
-    <Version>1.0.3</Version>
+    <Version>1.0.4</Version>
 	<RootNamespace>KhatiExcel</RootNamespace>
   </PropertyGroup>
 
