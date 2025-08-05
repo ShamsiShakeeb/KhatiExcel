@@ -10,7 +10,7 @@ namespace KhatiExcel.Feature
     public class LoadExcel : ILoadExcel
     {
         public (bool success, List<ExcelModel>[]? data, string? message, string? errorMessage)
-            Fetch(string path, bool header = true)
+            Fetch(string path, string sheetName, bool header = true)
         {
             try
             {
@@ -29,7 +29,7 @@ namespace KhatiExcel.Feature
 
                 DataSet dataSet = excelReader.AsDataSet(conf);
                 DataTable dt = dataSet.Tables[0];
-                var Wor = dataSet.Tables["Sheet1"];
+                var Wor = dataSet.Tables[sheetName];
 
                 if (dataSet == null)
                 {
@@ -40,8 +40,8 @@ namespace KhatiExcel.Feature
                     return (false, null, "Error Occurred", "Excel Dataset fetch failed");
                 }
 
-                var noOfRowCount = dataSet?.Tables?["Sheet1"]?.Rows.Count;
-                var colPosition = dataSet?.Tables?["Sheet1"]?.Columns.Count;
+                var noOfRowCount = dataSet?.Tables?[sheetName]?.Rows.Count;
+                var colPosition = dataSet?.Tables?[sheetName]?.Columns.Count;
 
                 List<string> ColumnHeader = new List<string>();
 
@@ -92,19 +92,17 @@ namespace KhatiExcel.Feature
         }
 
         public (bool success, List<ExcelModel>[]? data, string? message, string? errorMessage)
-            Fetch(IFormFile file, bool header = true)
+            Fetch(IFormFile file, string sheetName, bool header = true)
         {
             try
             {
                 if (file == null || file.Length == 0)
-                {
-                    return (false, null, "Invalid file", "Uploaded file is empty or null");
-                }
+                    return (false, null, "Invalid File", "The uploaded Excel file is empty or missing.");
 
                 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
                 using var stream = file.OpenReadStream();
-                using var excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
+                using IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
 
                 var conf = new ExcelDataSetConfiguration
                 {
@@ -114,46 +112,42 @@ namespace KhatiExcel.Feature
                     }
                 };
 
-                DataSet dataSet = excelReader.AsDataSet(conf);
-                if (dataSet == null || dataSet.Tables.Count == 0)
-                {
-                    return (false, null, "Error Occurred", "Excel Dataset fetch failed");
-                }
+                var dataSet = excelReader.AsDataSet(conf);
 
-                DataTable table = dataSet.Tables[0];
-                int rowCount = table.Rows.Count;
-                int colCount = table.Columns.Count;
+                if (dataSet == null || dataSet.Tables == null || !dataSet.Tables.Contains(sheetName))
+                    return (false, null, "Error Occurred", $"Sheet '{sheetName}' not found in the Excel file.");
 
-                List<string> columnHeaders = new List<string>();
+                var sheet = dataSet.Tables[sheetName];
+                int noOfRowCount = sheet.Rows.Count;
+                int colPosition = sheet.Columns.Count;
+
+                List<string> columnHeader = new List<string>();
 
                 if (header)
                 {
-                    for (int j = 0; j < colCount; j++)
+                    for (int j = 0; j < colPosition; j++)
                     {
-                        var headerValue = table.Rows[0][j]?.ToString();
-                        columnHeaders.Add(headerValue ?? $"Column{j + 1}");
+                        var text = sheet.Rows[0][j]?.ToString();
+                        columnHeader.Add(text ?? $"Column{j + 1}");
                     }
                 }
 
-                int actualRowCount = header ? rowCount - 1 : rowCount;
-                List<ExcelModel>[] listRows = new List<ExcelModel>[actualRowCount];
+                List<ExcelModel>[] listRows = new List<ExcelModel>[header ? noOfRowCount - 1 : noOfRowCount];
 
-                for (int i = header ? 1 : 0; i < rowCount; i++)
+                for (int i = header ? 1 : 0; i < noOfRowCount; i++)
                 {
-                    var rowList = new List<ExcelModel>();
-                    for (int j = 0; j < colCount; j++)
-                    {
-                        var cellValue = table.Rows[i][j];
-                        var model = new ExcelModel
-                        {
-                            ColumnName = header ? columnHeaders[j] : "",
-                            ColumnValue = cellValue?.ToString(),
-                            ColumnGroup = ((char)(65 + j)).ToString()
-                        };
-                        rowList.Add(model);
-                    }
+                    listRows[header ? i - 1 : i] = new List<ExcelModel>();
 
-                    listRows[header ? i - 1 : i] = rowList;
+                    for (int j = 0; j < colPosition; j++)
+                    {
+                        var value = sheet.Rows[i][j];
+                        listRows[header ? i - 1 : i].Add(new ExcelModel
+                        {
+                            ColumnName = header ? columnHeader[j] : "",
+                            ColumnValue = value?.ToString(),
+                            ColumnGroup = ((char)(65 + j)).ToString()
+                        });
+                    }
                 }
 
                 return (true, listRows, "Data Fetch Successfully", null);
